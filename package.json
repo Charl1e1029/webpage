@@ -1,20 +1,19 @@
 {
-  "name": "summercamp",
+  "name": "webpage",
   "version": "1.0.0",
-  "description": "CMSC 335 SummerCamp Project",
-  "main": "summerCampServer.js",
+  "description": "repo for my CMSC 335 final proj",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Charl1e1029/webpage.git"
+  },
   "author": "Charles Lin",
   "license": "ISC",
-  "dependencies": {
-    "body-parser": "^1.20.2",
-    "dotenv": "^16.3.1",
-    "ejs": "^3.1.9",
-    "express": "^4.18.2",
-    "fs": "^0.0.1-security",
-    "mongodb": "^6.3.0",
-    "nodemon": "^3.0.1"
-  }
+  "bugs": {
+    "url": "https://github.com/Charl1e1029/webpage/issues"
+  },
+  "homepage": "https://github.com/Charl1e1029/webpage#readme"
 }
