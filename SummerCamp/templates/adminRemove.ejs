@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Admin GPA</title>
+        <script>
+            window.onsubmit = () => {
+                return window.confirm("Are you sure you want to remove all applications?");
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Removing All Application</h1>
+        <form action="/processAdminRemove" method="post">
+            <label><input type="submit" value="Remove all applicants" name="remove" id="remove"></label>
+        </form>
+        <hr>
+        <a href="/">HOME</a>
+    </body>
+</html>
