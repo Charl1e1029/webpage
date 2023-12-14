@@ -1,14 +1,135 @@
+// Import required modules
+const dotenv = require('dotenv');
 const express = require('express');
-const app = express();
-const path = require('path');
-const fs = require('fs');
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const ejs = require('ejs');
+const path = require('path');
 
-app.use(bodyParser.urlencoded({extended:false}));
-app.set("views", path.resolve(__dirname, "templates"));
-app.set("view engine", "ejs");
-app.listen(5000);
+// Load environment variables from .env file
+dotenv.config();
 
-app.get("/", (req, res) => {
-    res.render("index");
+// Create an Express app
+const app = express();
+
+// Connect to MongoDB using environment variables
+//mongodb + srv://ktang124:<password>@cmsc335.bd5ljeg.mongodb.net/?retryWrites=true&w=majority
+const dbURI = `mongodb+srv://${process.env.MONGO_DB_USERNAME}:${process.env.MONGO_DB_PASSWORD}@cmsc335.bd5ljeg.mongodb.net/${process.env.MONGO_DB_NAME}?retryWrites=true&w=majority`;
+mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
+const db = mongoose.connection;
+
+// Set the view engine to EJS
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'templates'));
+
+// ...
+// Use bodyParser to parse JSON requests
+app.use(bodyParser.urlencoded({ extended: true }));
+// Handle MongoDB connection events
+db.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
 });
+
+db.once('open', () => {
+  console.log('Connected to MongoDB');
+});
+
+// Define a MongoDB schema and model
+const friend_schema = new mongoose.Schema({
+  name: { type: String, required: true },
+  username: { type: String, required: true },
+  timezone: { type: String, required: true },
+});
+collection = process.env.MONGO_COLLECTION;
+const friend_model = mongoose.model(collection, friend_schema);
+// Define routes
+
+app.get('/', (req, res) => {
+  // Render the submitForm.ejs file
+  res.render('index');
+});
+
+app.get('/add_friend', (req, res) => {
+  // Render the submitForm.ejs file
+  res.render('application');
+});
+
+app.post('/process_add_friend', (req, res) => {
+  // Handle submission of information
+  const { name, username, timezone, time } = req.body;
+  console.log(name, username, timezone, time);
+  const newEntry = new friend_model({
+    name, username, timezone, time
+  });
+
+  newEntry.save((err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error saving entry to the database' });
+    }
+     res.render('confirmation', { name, username, timezone, time});
+  });
+});
+
+app.get('/find_friend', (req, res) => {
+  // Render the reviewApplication.ejs file
+  res.render('findfriend');
+});
+app.post('/find_friend_by_username', (req, res) => {
+  const { username } = req.body;
+
+  if (!username) {
+    return res.status(400).json({ error: 'Username is required in the query parameters' });
+  }
+
+  campapplicants.findOne({ username: username }, (err, friend) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error retrieving applicant from the database' });
+    }
+
+    if (!friend) {
+      return res.status(404).json({ error: 'Applicant not found' });
+    }
+
+    const { name, username, timezone} = friend;
+
+    //call time api
+    // Render the confirmation page with applicant information
+    res.render('confirmation', { name, username, timezone, time});
+  });
+});
+
+
+
+
+// Start the server
+const PORT = process.argv[2] || 3000; // Use the provided port or default to 3000
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+  promptUser();
+});
+
+// Command line interpreter function
+function promptUser() {
+  const readline = require('readline');
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  rl.question('Type "stop" to shutdown the server: ', (command) => {
+    switch (command) {
+      case 'stop':
+        console.log('Shutting down the server');
+        rl.close();
+        process.exit(0);
+        break;
+      default:
+        console.log('Invalid command:', command);
+        break;
+    }
+
+    promptUser(); // Continue prompting
+  });
+}
+
+
