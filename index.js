@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const path = require('path');
-const axios = require('axios'); // Make sure to install axios using: npm install axios
+const axios = require('axios'); // Make sure to install axios using: npm install 
+
 // Load environment variables from .env file
 dotenv.config();
 
@@ -22,7 +23,6 @@ const db = mongoose.connection;
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'templates'));
 
-// ...
 // Use bodyParser to parse JSON requests
 app.use(bodyParser.urlencoded({ extended: true }));
 // Allow ejs files to use css
