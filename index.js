@@ -104,17 +104,13 @@ app.post('/process_add_friend', async (req, res) => {
     console.error('Error processing add friend:', error);
     return res.status(500).json({ error: 'Error processing add friend' });
   }
-});
-
-
-
-
   newEntry.save((err) => {
     if (err) {
       return res.status(500).json({ error: 'Error saving entry to the database' });
     }
      res.render('confirmation', { name, username, timezone, time});
   });
+});
 
 
 app.get('/find_friend', (req, res) => {
