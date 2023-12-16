@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+	    <title>Application Page</title>
+        <link rel="stylesheet" href="/pub/style.css" type="text/css">
+    </head>
+    <body>
+        <h1>Application Page</h1>
+        <div class="earth">
+            <form action="/process_add_friend" method="post">
+                <fieldset>
+                    <label><strong>Name: </strong><input type="text" name="name" id="name"></label>
+                    <br><br>
+                    <label><strong>Username: </strong><input type="text" name="username" id="username"></label>
+                    <br><br>
+                    <!-- Insert timezone API dropdown here -->
+                    <label><strong>Timezone:</strong></label>
+                    <select name="timezones">
+                        <!-- <!%- items %> -->
+                    </select>
+                </fieldset>
+                <br>
+                <input type="reset" value="Reset">
+                <input type="submit" value="Submit Application">
+            </form>
+            <p><a href="/">Home</a></p>
+        </div>
+    </body>
+</html>

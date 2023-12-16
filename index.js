@@ -25,6 +25,8 @@ app.set('views', path.join(__dirname, 'templates'));
 // ...
 // Use bodyParser to parse JSON requests
 app.use(bodyParser.urlencoded({ extended: true }));
+// Allow ejs files to use css
+app.use('/pub', express.static(__dirname + '/pub'));
 // Handle MongoDB connection events
 db.on('error', (err) => {
   console.error('MongoDB connection error:', err);
@@ -49,7 +51,7 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
-app.get('/add_friend', (req, res) => {
+app.get('/application', (req, res) => {
   // Render the submitForm.ejs file
   res.render('application');
 });
