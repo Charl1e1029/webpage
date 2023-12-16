@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const path = require('path');
-
+const axios = require('axios'); // Make sure to install axios using: npm install axios
 // Load environment variables from .env file
 dotenv.config();
 
@@ -54,13 +54,40 @@ app.get('/add_friend', (req, res) => {
   res.render('application');
 });
 
-app.post('/process_add_friend', (req, res) => {
-  // Handle submission of information
-  const { name, username, timezone, time } = req.body;
-  console.log(name, username, timezone, time);
-  const newEntry = new friend_model({
-    name, username, timezone, time
-  });
+
+
+
+
+app.post('/process_add_friend', async (req, res) => {
+  try {
+    // Handle submission of information
+    const { name, username, timezone } = req.body;
+    console.log(name, username, timezone);
+
+    // Get current time from the TimeAPI based on the specified timezone
+    const timeApiResponse = await axios.get(`https://timezoneapi.io/api/timezone/${encodeURIComponent(timezone)}`);
+    const time = timeApiResponse.data.data.datetime;
+
+    const newEntry = new friend_model({
+      name,
+      username,
+      timezone,
+      time
+    });
+
+    // Save the new entry to the database
+    await newEntry.save();
+
+    // Render the confirmation page with user information
+    res.render('confirmation', { name, username, timezone, time });
+  } catch (error) {
+    console.error('Error processing add friend:', error);
+    return res.status(500).json({ error: 'Error processing add friend' });
+  }
+});
+
+
+
 
   newEntry.save((err) => {
     if (err) {
@@ -68,7 +95,7 @@ app.post('/process_add_friend', (req, res) => {
     }
      res.render('confirmation', { name, username, timezone, time});
   });
-});
+
 
 app.get('/find_friend', (req, res) => {
   // Render the reviewApplication.ejs file
@@ -81,7 +108,7 @@ app.post('/find_friend_by_username', (req, res) => {
     return res.status(400).json({ error: 'Username is required in the query parameters' });
   }
 
-  campapplicants.findOne({ username: username }, (err, friend) => {
+  friend_model.findOne({ username: username }, (err, friend) => {
     if (err) {
       return res.status(500).json({ error: 'Error retrieving applicant from the database' });
     }
