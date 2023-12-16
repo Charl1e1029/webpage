@@ -52,8 +52,26 @@ app.get('/', (req, res) => {
 });
 
 app.get('/application', (req, res) => {
-  // Render the submitForm.ejs file
-  res.render('application');
+  // Utilizes time api to see all avaliable timezones
+  fetch('https://timeapi.io/api/TimeZone/AvailableTimeZones').then(response => response.json()).then(json => {
+    item = "";
+    json.forEach((ele) => {
+        item += `<option value="${ele}">${ele}</option>`;
+    });
+    const params = {
+        zones: item,
+    };
+    res.render('application', params);
+  })
+});
+
+app.post('/application_confirmation', (req, res) => {
+  // Get applicant info
+  let applicant = {name: req.body.name, username: req.body.username, timezone:req.body.timezone};
+  // Insert the User into MongoDB via createUser
+  createUser(applicant).then(() => {
+    res.render("confirmation", applicant)
+  });
 });
 
 app.post('/process_add_friend', (req, res) => {
@@ -76,32 +94,50 @@ app.get('/find_friend', (req, res) => {
   // Render the reviewApplication.ejs file
   res.render('findfriend');
 });
-app.post('/find_friend_by_username', (req, res) => {
-  const { username } = req.body;
 
-  if (!username) {
+app.post('/find_friend_by_username', (req, res) => {
+  const { user1, user2 } = req.body;
+  let timeInfo = {oneName:"", oneTime:"", twoName:"", twoTime:""};
+
+  if (!user1 || !user2) {
     return res.status(400).json({ error: 'Username is required in the query parameters' });
   }
 
-  campapplicants.findOne({ username: username }, (err, friend) => {
-    if (err) {
-      return res.status(500).json({ error: 'Error retrieving applicant from the database' });
+  findUsers(user1, user2, timeInfo).then(() => {
+    if (timeInfo.oneName === "") {
+      return res.status(400).json({ error: 'At Least One User Not Found!' });
+    } else {
+      // Fetch user1 timezone info from API
+      fetch(`https://timeapi.io/api/Time/current/zone?timeZone=${timeInfo.oneTime}`).then(response => response.json()).then(json1 => {
+        // Fetch user2 timezone info from API
+        fetch(`https://timeapi.io/api/Time/current/zone?timeZone=${timeInfo.twoTime}`).then(response => response.json()).then(json2 => {
+          let timeDiff = 0;
+          timeDiff = (Math.abs((json1.hour * 60 + json1.minute) - (json2.hour * 60 + json2.minute)) / 60).toFixed(1);
+          timeDiff = (24 - timeDiff) < timeDiff ? (24.0 - timeDiff).toFixed(1) : timeDiff
+          timeInfo.timeDifference = timeDiff
+          res.render("friends", timeInfo);
+        });
+      });
     }
-
-    if (!friend) {
-      return res.status(404).json({ error: 'Applicant not found' });
-    }
-
-    const { name, username, timezone} = friend;
-
-    //call time api
-    // Render the confirmation page with applicant information
-    res.render('confirmation', { name, username, timezone, time});
   });
 });
 
+// Define MongoDB connective functions
+async function createUser(applicant) {
+  const new_user = new friend_model(applicant);
+  await new_user.save();
+}
 
-
+async function findUsers(user1, user2, timeInfo) {
+  const u1 = await friend_model.findOne({'username': user1 }, 'name timezone');
+  const u2 = await friend_model.findOne({'username': user2 }, 'name timezone');
+  if (u1 && u2) {
+    timeInfo.oneName = u1.name
+    timeInfo.oneTime = u1.timezone
+    timeInfo.twoName = u2.name
+    timeInfo.twoTime = u2.timezone
+  }
+}
 
 // Start the server
 const PORT = process.argv[2] || 3000; // Use the provided port or default to 3000

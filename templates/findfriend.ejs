@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+	    <title>Find A Friend</title>
+        <link rel="stylesheet" href="/pub/style.css" type="text/css">
+    </head>
+    <body>
+        <h1>Find A Friend</h1>
+        <div class="earth">
+            <form action="/find_friend_by_username" method="post">
+                <fieldset>
+                    <label><strong>Your Username: </strong><input type="text" name="user1" id="user1" required></label>
+                    <br><br>
+                    <label><strong>Friend Username: </strong><input type="text" name="user2" id="user2" required></label>
+                </fieldset>
+                <br>
+                <input type="reset" value="Reset">
+                <input type="submit" value="Find Our Times!">
+            </form>
+            <p><a href="/">Home</a></p>
+        </div>
+    </body>
+</html>

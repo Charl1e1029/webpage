@@ -8,16 +8,15 @@
     <body>
         <h1>Application Page</h1>
         <div class="earth">
-            <form action="/process_add_friend" method="post">
+            <form action="/application_confirmation" method="post">
                 <fieldset>
-                    <label><strong>Name: </strong><input type="text" name="name" id="name"></label>
+                    <label><strong>Name: </strong><input type="text" name="name" id="name" required></label>
                     <br><br>
-                    <label><strong>Username: </strong><input type="text" name="username" id="username"></label>
+                    <label><strong>Username: </strong><input type="text" name="username" id="username" required></label>
                     <br><br>
-                    <!-- Insert timezone API dropdown here -->
                     <label><strong>Timezone:</strong></label>
-                    <select name="timezones">
-                        <!-- <!%- items %> -->
+                    <select name="timezone" id="timezone">
+                        <%- zones %>
                     </select>
                 </fieldset>
                 <br>
